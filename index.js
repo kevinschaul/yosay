@@ -18,19 +18,26 @@ var ansiRegex = require('ansi-regex')();
 <.________   `---'        \
           `--------------->
 
+      ..~~~~~~~~....
+   ,-'              ``_
+  /       d@b   d@b    `\
+ |       :* @l :* @l     `\
+ /        `PP   `PP        |
+<._____     \____/          \>
+       ````-----------``````
+
 */
 
 var topOffset = 3;
 var leftOffset = 17;
 var defaultGreeting =
-  '\n        ' + chalk.green('__________') +
-  '\n     ' + chalk.green('_~`          `~~-.    ') +
-  '\n    ' + chalk.green('(                  \\   ') +
-  '\n   ' + chalk.green('/') + '       ' + chalk.white('(') + chalk.gray('o') + chalk.white(') (') + chalk.gray('o') + chalk.white(')') + chalk.green('      \\  ') +
-  '\n  ' + chalk.green('/        .      .      \\ ') +
-  '\n ' + chalk.green('/          \\    |       |') +
-  '\n' + chalk.green('<.________   `---\'        \\') +
-  '\n' + chalk.green('          `---------------->');
+  '\n      ' + chalk.green('..~~~~~~~~....') +
+  '\n   ' + chalk.green(',-\'              ``_       ') +
+  '\n  ' + chalk.green('/') + '       ' + chalk.white('d@b   d@b') + '    ' + chalk.green('`\\     ') +
+  '\n ' + chalk.green('|') + '       ' + chalk.white(':') + chalk.bold.bgBlack('* ') + chalk.white('@l :') + chalk.bold.bgBlack('* ') + chalk.white('@l') + chalk.green('     `\\   ') +
+  '\n ' + chalk.green('/        ') + chalk.white('`PP   `PP') + chalk.green('        |  ') +
+  '\n' + chalk.green('<._____     ') + chalk.magenta('\\____/') + chalk.green('          \\>') +
+  '\n' + chalk.green('       ````-----------``````  ');
 
 module.exports = function (message, options) {
   message = (message || 'Welcome to Yeoman, ladies and gentlemen!').trim();
