@@ -1,72 +1,69 @@
-# yosay [![Build Status](https://travis-ci.org/yeoman/yosay.svg?branch=master)](https://travis-ci.org/yeoman/yosay)
+# podsay
 
-> Tell Yeoman what to say
+> Tell Peapod what to say
 
 Like [cowsay](http://en.wikipedia.org/wiki/Cowsay), but less cow.
 
-![](screenshot.png)
+(Forked from [yosay](https://github.com/yeoman/yosay))
 
 
 ## Install
 
 ```sh
-$ npm install --save yosay
+$ npm install --save podsay
 ```
 
 
 ## Usage
 
 ```js
-var yosay = require('yosay');
+var say = require('podsay');
 
-console.log(yosay('Hello, and welcome to my fantastic generator full of whimsy and bubble gum!'));
+console.log(podsay('I am a peapod'));
 
 /*
-     _-----_
-    |       |    .--------------------------.
-    |--(o)--|    | Hello, and welcome to my |
-   `---------´   | fantastic generator full |
-    ( _´U`_ )    |   of whimsy and bubble   |
-    /___A___\    |           gum!           |
-     |  ~  |     '--------------------------'
-   __'.___.'__
- ´   `  |° ´ Y `
+        __________
+     _~`          `~~-.    .--------------------------.
+    (                  \   |       I am a peapod      |
+   /       (o) (o)      \  '--------------------------'
+  /        .      .      \
+ /          \    |       |
+<.________   `---'        \
+          `---------------->
  */
 ```
 
-*You can style your text with [chalk](https://github.com/sindresorhus/chalk) before passing it to `yosay`.*
+*You can style your text with [chalk](https://github.com/sindresorhus/chalk) before passing it to `podsay`.*
 
 
 ## CLI
 
 ```
-$ npm install --global yosay
+$ npm install --global podsay
 ```
 
 ```
-$ yosay --help
+$ podsay --help
 
   Usage
-    yosay <string>
-    yosay <string> --maxLength 8
-    echo <string> | yosay
+    podsay <string>
+    podsay <string> --maxLength 8
+    echo <string> | podsay
 
   Example
-    yosay 'Sindre is a horse'
+    podsay "Let's make a graphic"
 
-     _-----_
-    |       |    .--------------------------.
-    |--(o)--|    |     Sindre is a horse    |
-   `---------´   '--------------------------'
-    ( _´U`_ )
-    /___A___\
-     |  ~  |
-   __'.___.'__
- ´   `  |° ´ Y `
+        __________
+     _~`          `~~-.    .--------------------------.
+    (                  \   |   Let's make a graphic   |
+   /       (o) (o)      \  '--------------------------'
+  /        .      .      \
+ /          \    |       |
+<.________   `---'        \
+          `---------------->
 ```
 
 
 ## License
 
 [BSD license](http://opensource.org/licenses/bsd-license.php)
-Copyright (c) Google

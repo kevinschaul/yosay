@@ -1,7 +1,7 @@
 {
-  "name": "yosay",
-  "version": "1.0.2",
-  "description": "Tell Yeoman what to say",
+  "name": "podsay",
+  "version": "0.0.1",
+  "description": "Tell Peapod what to say",
   "license": "BSD",
   "keywords": [
     "cli",
@@ -14,11 +14,9 @@
     "message",
     "ansi"
   ],
-  "homepage": "http://yeoman.io",
-  "author": "The Yeoman Team",
-  "repository": "yeoman/yosay",
+  "repository": "kevinschaul/podsay",
   "bin": {
-    "yosay": "cli.js"
+    "podsay": "cli.js"
   },
   "files": [
     "index.js",
