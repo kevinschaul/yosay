@@ -19,7 +19,7 @@ $ npm install --save podsay
 ```js
 var say = require('podsay');
 
-console.log(podsay('I am a peapod'));
+console.log(podsay('trust me, i am a peapod'));
 
 /*
       ..~~~~~~~~....
