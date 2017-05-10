@@ -1,45 +1,32 @@
 'use strict';
-var chalk = require('chalk');
-var pad = require('pad-component');
-var wrap = require('word-wrap');
-var stringLength = require('string-length');
-var stripAnsi = require('strip-ansi');
-var ansiStyles = require('ansi-styles');
-var ansiRegex = require('ansi-regex')();
+const chalk = require('chalk');
+const pad = require('pad-component');
+const wrap = require('wrap-ansi');
+const stringWidth = require('string-width');
+const stripAnsi = require('strip-ansi');
+const ansiStyles = require('ansi-styles');
+const ansiRegex = require('ansi-regex')();
+const cliBoxes = require('cli-boxes');
 
+const border = cliBoxes.round;
 
-/*
-        __________
-     _~`          `~~-.
-    (                  \
-   /       (o) (o)      \
-  /        .      .      \
- /          \    |       |
-<.________   `---'        \
-          `--------------->
+const defaultGreetingLines = [
+  '\n                              ',
+  '\n' + chalk.green('      ..~~~~~~~~....          '),
+  '\n' + chalk.green('   ,-\'              \'\'_       '),
+  '\n' + chalk.green('  /       ') + chalk.white('d@b   d@b') + chalk.green('    `\\     '),
+  '\n' + chalk.green(' |       ') + chalk.white(':') + chalk.bold.bgBlack('* ') + chalk.white('@l :') + chalk.bold.bgBlack('*') + chalk.white(' @l') + chalk.green('     `\\   '),
+  '\n' + chalk.green(' /        ') + chalk.white('`PP   `PP') + chalk.green('        |  '),
+  '\n' + chalk.green('<._____     ') + chalk.magenta('\\____/') + chalk.green('          \\>'),
+  '\n' + chalk.green('       ````-----------``````  '),
+  '\n                              '
+];
 
-      ..~~~~~~~~....
-   ,-'              ``_
-  /       d@b   d@b    `\
- |       :* @l :* @l     `\
- /        `PP   `PP        |
-<._____     \____/          \>
-       ````-----------``````
+const defaultGreeting = defaultGreetingLines.join('');
+const min = Math.min.apply(null, defaultGreetingLines.map(s => s.length));
+const leftOffset = min - 1;
 
-*/
-
-var topOffset = 3;
-var leftOffset = 17;
-var defaultGreeting =
-  '\n      ' + chalk.green('..~~~~~~~~....') +
-  '\n   ' + chalk.green(',-\'              ``_       ') +
-  '\n  ' + chalk.green('/') + '       ' + chalk.white('d@b   d@b') + '    ' + chalk.green('`\\     ') +
-  '\n ' + chalk.green('|') + '       ' + chalk.white(':') + chalk.bold.bgBlack('* ') + chalk.white('@l :') + chalk.bold.bgBlack('* ') + chalk.white('@l') + chalk.green('     `\\   ') +
-  '\n ' + chalk.green('/        ') + chalk.white('`PP   `PP') + chalk.green('        |  ') +
-  '\n' + chalk.green('<._____     ') + chalk.magenta('\\____/') + chalk.green('          \\>') +
-  '\n' + chalk.green('       ````-----------``````  ');
-
-module.exports = function (message, options) {
+module.exports = (message, options) => {
   message = (message || 'Welcome to Yeoman, ladies and gentlemen!').trim();
   options = options || {};
 
@@ -59,41 +46,52 @@ module.exports = function (message, options) {
    * Better implementations welcome :)
    */
 
-  var maxLength = 24;
-  var frame;
-  var styledIndexes = {};
-  var completedString = '';
-  var regExNewLine;
+  let maxLength = 24;
+  const styledIndexes = {};
+  let completedString = '';
+  let topOffset = 4;
+
+  // Amount of characters of the yeoman character »column«      → `    /___A___\   /`
+  const YEOMAN_CHARACTER_WIDTH = leftOffset;
+
+  // Amount of characters of the default top frame of the speech bubble → `╭──────────────────────────╮`
+  const DEFAULT_TOP_FRAME_WIDTH = 28;
+
+  // Amount of characters of a total line
+  let TOTAL_CHARACTERS_PER_LINE = YEOMAN_CHARACTER_WIDTH + DEFAULT_TOP_FRAME_WIDTH;
+
+  // The speech bubble will overflow the Yeoman character if the message is too long.
+  const MAX_MESSAGE_LINES_BEFORE_OVERFLOW = 7;
 
   if (options.maxLength) {
     maxLength = stripAnsi(message).toLowerCase().split(' ').sort()[0].length;
 
     if (maxLength < options.maxLength) {
       maxLength = options.maxLength;
+      TOTAL_CHARACTERS_PER_LINE = maxLength + YEOMAN_CHARACTER_WIDTH + topOffset;
     }
   }
 
-  regExNewLine = new RegExp('\\s{' + maxLength + '}');
+  const regExNewLine = new RegExp(`\\s{${maxLength}}`);
+  const borderHorizontal = border.horizontal.repeat(maxLength + 2);
 
-  frame = {
-    top: '.' + pad('', maxLength + 2, '-') + '.',
-    side: ansiStyles.reset.open + '|' + ansiStyles.reset.open,
-    bottom: ansiStyles.reset.open + '\'' + pad('', maxLength + 2, '-') + '\''
+  const frame = {
+    top: border.topLeft + borderHorizontal + border.topRight,
+    side: ansiStyles.reset.open + border.vertical + ansiStyles.reset.open,
+    bottom: ansiStyles.reset.open + border.bottomLeft + borderHorizontal + border.bottomRight
   };
 
-  message.replace(ansiRegex, function (match, offset) {
-    Object.keys(styledIndexes).forEach(function (key) {
+  message.replace(ansiRegex, (match, offset) => {
+    Object.keys(styledIndexes).forEach(key => {
       offset -= styledIndexes[key].length;
     });
 
     styledIndexes[offset] = styledIndexes[offset] ? styledIndexes[offset] + match : match;
   });
 
-  return wrap(stripAnsi(message), { width: maxLength })
+  return wrap(stripAnsi(message), maxLength, {hard: true})
     .split(/\n/)
-    .reduce(function (greeting, str, index, array) {
-      var paddedString;
-
+    .reduce((greeting, str, index, array) => {
       if (!regExNewLine.test(str)) {
         str = str.trim();
       }
@@ -102,15 +100,15 @@ module.exports = function (message, options) {
 
       str = completedString
         .substr(completedString.length - str.length)
-        .replace(/./g, function (char, charIndex) {
+        .replace(/./g, (char, charIndex) => {
           if (index > 0) {
             charIndex += completedString.length - str.length + index;
           }
 
-          var hasContinuedStyle = 0;
-          var continuedStyle;
+          let hasContinuedStyle = 0;
+          let continuedStyle;
 
-          Object.keys(styledIndexes).forEach(function (offset) {
+          Object.keys(styledIndexes).forEach(offset => {
             if (charIndex > offset) {
               hasContinuedStyle++;
               continuedStyle = styledIndexes[offset];
@@ -125,20 +123,43 @@ module.exports = function (message, options) {
             return styledIndexes[charIndex] + char;
           } else if (hasContinuedStyle >= 2) {
             return continuedStyle + char;
-          } else {
-            return char;
           }
+
+          return char;
         })
         .trim();
 
-      paddedString = pad({
-        length: stringLength(str),
-        valueOf: function () {
+      const paddedString = pad({
+        length: stringWidth(str),
+        valueOf() {
           return ansiStyles.reset.open + str + ansiStyles.reset.open;
         }
       }, maxLength);
 
       if (index === 0) {
+        // Need to adjust the top position of the speech bubble depending on the
+        // amount of lines of the message.
+        if (array.length === 2) {
+          topOffset -= 1;
+        }
+
+        if (array.length >= 3) {
+          topOffset -= 2;
+        }
+
+        // The speech bubble will overflow the Yeoman character if the message
+        // is too long. So we vertically center the bubble by adding empty lines
+        // on top of the greeting.
+        if (array.length > MAX_MESSAGE_LINES_BEFORE_OVERFLOW) {
+          const emptyLines = Math.ceil((array.length - MAX_MESSAGE_LINES_BEFORE_OVERFLOW) / 2);
+
+          for (let i = 0; i < emptyLines; i++) {
+            greeting.unshift('');
+          }
+
+          frame.top = pad.left(frame.top, TOTAL_CHARACTERS_PER_LINE);
+        }
+
         greeting[topOffset - 1] += frame.top;
       }
 
@@ -146,7 +167,7 @@ module.exports = function (message, options) {
         (greeting[index + topOffset] || pad.left('', leftOffset)) +
         frame.side + ' ' + paddedString + ' ' + frame.side;
 
-      if (!array[index + 1]) {
+      if (array.length === index + 1) {
         greeting[index + topOffset + 1] =
           (greeting[index + topOffset + 1] || pad.left('', leftOffset)) +
           frame.bottom;
